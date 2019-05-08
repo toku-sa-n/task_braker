@@ -6,6 +6,13 @@ TODO_FILE = "#{ENV['HOME']}/.todo".freeze
 COMPLETED = 1
 UNCOMPLETED = 0
 
+def count_file_lines(file_name)
+  File.open(file_name) do |file|
+    while file.gets; end
+    return file.lineno
+  end
+end
+
 def show_help
   #  print <<EOF
   # Usage: todo COMMAND ARGUMENTS
@@ -60,12 +67,22 @@ def uncheck_todo(todo_index)
 end
 
 def show_todos
-  File.open(TODO_FILE).each_line do |line|
-    todo_content, todo_status = line.match(/(.+),([01]),[0-9]+/)[1..2]
-    if todo_status.to_i == 0 # if the todo is not completed.
-      print "\e[31m#{todo_content}\e[0m\n" # \e[31m colorizes to red. \e[0m will reset color.
-    else
-      puts "\e[32m#{todo_content}\e[0m" # \e[32m colorizes to green.
+  return unless File.exist?(TODO_FILE)
+  return if File.size(TODO_FILE) == 0
+
+  # To arrange the vertical line of the indexes, calculate the digits.
+  digit_number = Math.log10(count_file_lines(TODO_FILE)) + 1
+  File.open(TODO_FILE) do |file|
+    file.each_line do |line|
+      todo_content, todo_status = line.match(/(.+),([01]),[0-9]+/)[1..2]
+
+      print "#{file.lineno.to_s.rjust(digit_number)}: "
+      if todo_status.to_i == 0 # if the todo is not completed.
+        # For some reasons, RED='\e[31m';print "#{RED}" will print \e[31m itself.
+        print "\e[31m#{todo_content}\e[0m\n" # \e[31m colorizes to red. \e[0m will reset color.
+      else
+        puts "\e[32m#{todo_content}\e[0m" # \e[32m colorizes to green.
+      end
     end
   end
 end
