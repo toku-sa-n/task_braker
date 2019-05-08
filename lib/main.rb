@@ -1,5 +1,5 @@
 # The format of TODO_FILE
-# {content of todo},{0(undone) or 1(done)},{level}
+# {content of todo},{0(uncompleted) or 1(completed)},{level}
 # level: 0 is root. level of subtodos starts from 1.
 
 TODO_FILE = "#{ENV['HOME']}/.todo".freeze
@@ -33,9 +33,7 @@ def add_todo(todo)
     return 1
   end
 
-  File.open(TODO_FILE, 'a') do |file|
-    file.puts("#{todo},0,0")
-  end
+  File.open(TODO_FILE, 'a').puts("#{todo},0,0")
 end
 
 def change_todo_process(todo_index, process_number)
@@ -51,11 +49,9 @@ def change_todo_process(todo_index, process_number)
 
   # read all lines, check the specified todo, then join all todos and write it to TODO file.
   todo_lines = File.readlines(TODO_FILE)
-  # check or uncheck the specified todo.
+  # mark the specified todo as COMPLETED or UNCOMPLETED.
   todo_lines[todo_index_number - 1].gsub!(/(.+),[01],([0-9]+)/) { "#{Regexp.last_match(1)},#{process_number},#{Regexp.last_match(2)}" }
-  File.open(TODO_FILE, 'w') do |file|
-    file.write(todo_lines.join)
-  end
+  File.open(TODO_FILE, 'w').write(todo_lines.join)
 end
 
 def check_todo(todo_index)
@@ -78,10 +74,7 @@ def show_todos
       todo_level = todo_level.to_i
 
       print "#{file.lineno.to_s.rjust(digit_number)}: "
-      if todo_level > 0
-        print '-' * todo_level + '>'
-        print ' '
-      end
+      print '-' * todo_level + '> ' if todo_level > 0 # subtodo arrow
 
       if todo_status.to_i == UNCOMPLETED
         # For some reasons, RED='\e[31m';print "#{RED}" will print \e[31m itself.
