@@ -3,19 +3,15 @@
 # level: 0 is root. level of subtodos starts from 1.
 
 TODO_FILE = "#{ENV['HOME']}/.todo".freeze
-DONE = 1
-UNDONE = 0
-
-RED = '\e[31m'.freeze
-GREEN = '\e[32m'.freeze
-RESET_COLOR = '\e[0m'.freeze
+COMPLETED = 1
+UNCOMPLETED = 0
 
 def show_help
   #  print <<EOF
   # Usage: todo COMMAND ARGUMENTS
   #   add     TODO:        Add a todo.
-  #   check   NUMBER:      Mark a todo as done.
-  #   uncheck NUMBER:      Mark a todo as undone.
+  #   check   NUMBER:      Mark a todo as completed.
+  #   uncheck NUMBER:      Mark a todo as incompleted.
   #   change  NUMBER TODO: Change a todo.
   #   delete  NUMBER:      Delete a todo.
   #   subtodo NUMBER TODO: Add a subtodo.
@@ -56,22 +52,20 @@ def change_todo_process(todo_index, process_number)
 end
 
 def check_todo(todo_index)
-  change_todo_process(todo_index, DONE)
+  change_todo_process(todo_index, COMPLETED)
 end
 
 def uncheck_todo(todo_index)
-  change_todo_process(todo_index, UNDONE)
+  change_todo_process(todo_index, UNCOMPLETED)
 end
 
 def show_todos
-  File.open(TODO_FILE) do |file|
-    file.each_line do |line|
-      todo_content, todo_status = line.match(/(\w+),([01]),[0-9]+/)[1..2]
-      if todo_status.to_i == 0
-        print "#{RED}#{todo_content}#{RESET_COLOR}\n"
-      else
-        puts "#{GREEN}#{todo_content}#{RESET_COLOR}"
-      end
+  File.open(TODO_FILE).each_line do |line|
+    todo_content, todo_status = line.match(/(.+),([01]),[0-9]+/)[1..2]
+    if todo_status.to_i == 0 # if the todo is not completed.
+      print "\e[31m#{todo_content}\e[0m\n" # \e[31m colorizes to red. \e[0m will reset color.
+    else
+      puts "\e[32m#{todo_content}\e[0m" # \e[32m colorizes to green.
     end
   end
 end
