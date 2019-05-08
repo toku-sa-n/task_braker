@@ -72,16 +72,15 @@ def show_todos
     file.each_line do |line|
       todo_content, todo_status, todo_level = line.match(/(.+),([01]),([0-9]+)/)[1..3]
       todo_level = todo_level.to_i
+      todo_status = todo_status.to_i
 
       print "#{file.lineno.to_s.rjust(digit_number)}: "
       print '-' * todo_level + '> ' if todo_level > 0 # subtodo arrow
 
-      if todo_status.to_i == UNCOMPLETED
-        # For some reasons, RED='\e[31m';print "#{RED}" will print \e[31m itself.
-        print "\e[31m#{todo_content}\e[0m\n" # \e[31m colorizes to red. \e[0m will reset color.
-      else
-        puts "\e[32m#{todo_content}\e[0m" # \e[32m colorizes to green.
-      end
+      # For some reasons, RED='\e[31m';print "#{RED}" will print \e[31m itself.
+      # \e[31m is red, \e[32m is green.
+      print todo_status == UNCOMPLETED ? "\e[31m" : "\e[32m"
+      puts "#{todo_content}\e[0m"
     end
   end
 end
