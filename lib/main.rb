@@ -39,7 +39,7 @@ def add_todo(todo)
 end
 
 def change_todo_process(todo_index, process_number)
-  # process_number is either 0(undone) or 1(done).
+  # process_number is either COMPLETED or UNCOMPLETED.
 
   todo_index_number = todo_index.to_i
 
@@ -52,7 +52,7 @@ def change_todo_process(todo_index, process_number)
   # read all lines, check the specified todo, then join all todos and write it to TODO file.
   todo_lines = File.readlines(TODO_FILE)
   # check or uncheck the specified todo.
-  todo_lines[todo_index_number - 1].gsub!(/(\w+),[01],([0-9]+)/) { "#{Regexp.last_match(1)},#{process_number},#{Regexp.last_match(2)}" }
+  todo_lines[todo_index_number - 1].gsub!(/(.+),[01],([0-9]+)/) { "#{Regexp.last_match(1)},#{process_number},#{Regexp.last_match(2)}" }
   File.open(TODO_FILE, 'w') do |file|
     file.write(todo_lines.join)
   end
@@ -67,17 +67,17 @@ def uncheck_todo(todo_index)
 end
 
 def show_todos
-  return unless File.exist?(TODO_FILE)
-  return if File.size(TODO_FILE) == 0
+  return 1 unless File.exist?(TODO_FILE)
+  return 1 if File.size(TODO_FILE) == 0
 
-  # To arrange the vertical line of the indexes, calculate the digits.
+  # To arrange vertical line of the indexes, calculate digits.
   digit_number = Math.log10(count_file_lines(TODO_FILE)) + 1
   File.open(TODO_FILE) do |file|
     file.each_line do |line|
       todo_content, todo_status = line.match(/(.+),([01]),[0-9]+/)[1..2]
 
       print "#{file.lineno.to_s.rjust(digit_number)}: "
-      if todo_status.to_i == 0 # if the todo is not completed.
+      if todo_status.to_i == UNCOMPLETED
         # For some reasons, RED='\e[31m';print "#{RED}" will print \e[31m itself.
         print "\e[31m#{todo_content}\e[0m\n" # \e[31m colorizes to red. \e[0m will reset color.
       else
