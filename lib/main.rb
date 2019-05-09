@@ -28,6 +28,7 @@ def show_help
   #   uncheck NUMBER:      Mark a todo as incompleted.
   #   change  NUMBER TODO: Change a todo.
   #   delete  NUMBER:      Delete a todo.
+  #   delete_completed:    Delete all completed todos.
   #   subtodo NUMBER TODO: Add a subtodo.
   #   show:                Show todos.
   #   help:                Show this message.
@@ -106,6 +107,15 @@ def delete_todo(todo_index)
   end
 end
 
+def delete_all_completed_todo
+  overwrite_todo do |todos|
+    todos.delete_if do |todo|
+      todo_status = todo.match(/.+,([01]),[0-9]+/)[1].to_i
+      todo_status == COMPLETED
+    end
+  end
+end
+
 def main
   case ARGV[0]
   when 'add'
@@ -118,6 +128,8 @@ def main
     show_todos
   when 'delete'
     delete_todo(ARGV[1])
+  when 'delete_completed'
+    delete_all_completed_todo
   else
     show_help
   end
