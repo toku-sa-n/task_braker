@@ -27,6 +27,15 @@ def show_help
   # EOF
 end
 
+def show_message_if_index_not_positive(todo_index)
+  # Return True if index is not positive, otherwise return False.
+  if todo_index <= 0
+    STDERR.puts 'Todo index should be positive number.'
+    return true
+  end
+  false
+end
+
 def add_todo(todo)
   if todo.nil?
     show_help
@@ -39,18 +48,13 @@ end
 def change_todo_process(todo_index, process_number)
   # process_number is either COMPLETED or UNCOMPLETED.
 
-  todo_index_number = todo_index.to_i
-
-  # if todo_index_number is 0, todo_index was an invalid number because to_i converts any non-number to 0.
-  if todo_index_number == 0
-    show_help
-    return 1
-  end
+  todo_index = todo_index.to_i
+  return if show_message_if_index_not_positive(todo_index)
 
   # read all lines, check the specified todo, then join all todos and write it to TODO file.
   todo_lines = File.readlines(TODO_FILE)
   # mark the specified todo as COMPLETED or UNCOMPLETED.
-  todo_lines[todo_index_number - 1].gsub!(/(.+),[01],([0-9]+)/) { "#{Regexp.last_match(1)},#{process_number},#{Regexp.last_match(2)}" }
+  todo_lines[todo_index - 1].gsub!(/(.+),[01],([0-9]+)/) { "#{Regexp.last_match(1)},#{process_number},#{Regexp.last_match(2)}" }
   File.open(TODO_FILE, 'w').write(todo_lines.join)
 end
 
@@ -85,6 +89,16 @@ def show_todos
   end
 end
 
+def delete_todo(todo_index)
+  todo_index = todo_index.to_i
+
+  return if show_message_if_index_not_positive(todo_index)
+
+  todos = File.readlines(TODO_FILE)
+  todos.delete_at(todo_index - 1)
+  File.open(TODO_FILE, 'w').write(todos.join)
+end
+
 def main
   case ARGV[0]
   when 'add'
@@ -95,7 +109,9 @@ def main
     uncheck_todo(ARGV[1])
   when 'show'
     show_todos
-  when 'help'
+  when 'delete'
+    delete_todo(ARGV[1])
+  else
     show_help
   end
 end
