@@ -38,7 +38,7 @@ end
 def show_message_if_index_not_positive(todo_index)
   # Return True if index is not positive, otherwise return False.
   if todo_index <= 0
-    STDERR.puts 'Todo index should be positive number.'
+    warn 'Todo index should be positive number.'
     return true
   end
   false
@@ -56,7 +56,6 @@ end
 def change_todo_process(todo_index, process_number)
   # process_number is either COMPLETED or UNCOMPLETED.
 
-  todo_index = todo_index.to_i
   return if show_message_if_index_not_positive(todo_index)
 
   # read all lines, check the specified todo, then join all todos and write it to TODO file.
@@ -90,7 +89,7 @@ def show_todos
       print '-' * todo_level + '> ' if todo_level > 0 # subtodo arrow
 
       # For some reasons, RED='\e[31m';print "#{RED}" will print \e[31m itself.
-      # \e[31m is red, \e[32m is green.
+      # \e[31m is red, \e[32m is green. \e[0m will reset colors.
       print todo_status == UNCOMPLETED ? "\e[31m" : "\e[32m"
       puts "#{todo_content}\e[0m"
     end
@@ -98,8 +97,6 @@ def show_todos
 end
 
 def delete_todo(todo_index)
-  todo_index = todo_index.to_i
-
   return if show_message_if_index_not_positive(todo_index)
 
   overwrite_todo do |todos|
@@ -121,13 +118,13 @@ def main
   when 'add'
     add_todo(ARGV[1])
   when 'check'
-    check_todo(ARGV[1])
+    check_todo(ARGV[1].to_i)
   when 'uncheck'
-    uncheck_todo(ARGV[1])
+    uncheck_todo(ARGV[1].to_i)
   when 'show'
     show_todos
   when 'delete'
-    delete_todo(ARGV[1])
+    delete_todo(ARGV[1].to_i)
   when 'delete_completed'
     delete_all_completed_todo
   else
