@@ -14,7 +14,7 @@ def count_file_lines(file_name)
 end
 
 def overwrite_todo
-  # Assign an array of todos to a block variable.
+  # Assign an two-dimention array of todos to a block variable.
   todos = CSV.readlines(TODO_FILE)
   todos.shift
   yield(todos)
@@ -94,7 +94,7 @@ def show_todos
 
     # For some reasons, RED='\e[31m';print "#{RED}" will print \e[31m itself.
     # \e[31m is red, \e[32m is green. \e[0m will reset colors.
-    print todo['status'].to_i == UNCOMPLETED ? "\e[31m" : "\e[32m"
+    print todo['status'].to_i == UNCOMPLETED ? "\e[31m□ " : "\e[32m✓ "
     puts "#{todo['content']}\e[0m"
   end
 end
