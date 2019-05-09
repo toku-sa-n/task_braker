@@ -13,6 +13,13 @@ def count_file_lines(file_name)
   end
 end
 
+def overwrite_todo
+  # Assign an array of todos to a block variable.
+  todos = File.readlines(TODO_FILE)
+  yield(todos)
+  File.open(TODO_FILE, 'w').write(todos.join)
+end
+
 def show_help
   #  print <<EOF
   # Usage: todo COMMAND ARGUMENTS
@@ -52,10 +59,10 @@ def change_todo_process(todo_index, process_number)
   return if show_message_if_index_not_positive(todo_index)
 
   # read all lines, check the specified todo, then join all todos and write it to TODO file.
-  todo_lines = File.readlines(TODO_FILE)
-  # mark the specified todo as COMPLETED or UNCOMPLETED.
-  todo_lines[todo_index - 1].gsub!(/(.+),[01],([0-9]+)/) { "#{Regexp.last_match(1)},#{process_number},#{Regexp.last_match(2)}" }
-  File.open(TODO_FILE, 'w').write(todo_lines.join)
+  overwrite_todo do |todos|
+    # mark the specified todo as COMPLETED or UNCOMPLETED.
+    todos[todo_index - 1].gsub!(/(.+),[01],([0-9]+)/) { "#{Regexp.last_match(1)},#{process_number},#{Regexp.last_match(2)}" }
+  end
 end
 
 def check_todo(todo_index)
@@ -94,9 +101,9 @@ def delete_todo(todo_index)
 
   return if show_message_if_index_not_positive(todo_index)
 
-  todos = File.readlines(TODO_FILE)
-  todos.delete_at(todo_index - 1)
-  File.open(TODO_FILE, 'w').write(todos.join)
+  overwrite_todo do |todos|
+    todos.delete_at(todo_index - 1)
+  end
 end
 
 def main
