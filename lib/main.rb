@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 # The format of TODO_FILE
 # {content of todo},{0(uncompleted) or 1(completed)},{level}
 # level: 0 is root. level of subtodos starts from 1.
